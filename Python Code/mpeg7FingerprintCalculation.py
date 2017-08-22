@@ -306,39 +306,89 @@ def euclideanDistance(smallMatrix, bigMatrix):
     return euclideanDistances
 
 
-################################################################
-# Fingerprint calculation of one song
-################################################################
+def calc_fingerprint(file, save=True):
+    """
+    Calculates a fingerpritn and saves the result as .CSV file
+    Args:
+        file: (str) path to wave file.wave
+        save: (bool)
+    Resturns:
+        fingerprint: (2darray) matrix which can be compared with other fingerprints
+    """
+    audioFile, samplingrate = readAudiofile(file)
+    spectralFlatness = AudioSpectrumFlatness(audioFile, samplingrate)
+    signature = AudioSignature(spectralFlatness, 250, 1600, 32)
 
-file = 'path/to/file.wav'
-audioFile, samplingrate = readAudiofile(file)
-spectralFlatness = AudioSpectrumFlatness(audioFile, samplingrate)
-signature = AudioSignature(spectralFlatness, 250, 1600, 32)
-
-# Save fingerprint as .csv file
-np.savetxt(file[-4]+'.csv', signature[0], delimiter=",")
+    if save:
+        # Save fingerprint as .csv file
+        np.savetxt(file[-4] + '.csv', signature[0], delimiter=",")
+        print("finger print has been calculated successfully")
+    return signature
 
 
-################################################################
-# Automatic fingerprint calculation of a folder
-################################################################
-#
-# location = os.path.abspath(os.path.dirname(__file__))  # same folder
-# namesAll = fileimporter(location, 'wav')
-#
-# for file in namesAll:
-#     fileNew = file.replace(' ', '')[:-4]
-#     audioFile, samplingrate = readAudiofile(file)
-#     spectralFlatness = AudioSpectrumFlatness(audioFile, samplingrate)
-#     signature = AudioSignature(spectralFlatness, 250, 1600, 32)
-#     # remove existing file
-#     if not os.path.exists(location +'/csvFiles/'):
-#         os.makedirs(location +'/csvFiles/')
-#     try:
-#         os.remove(location +'/csvFiles/'+ fileNew + '.csv')
-#         print('Remove old .csv file')
-#     except OSError:
-#         print('no old file '+fileNew+'.csv has not been found')
-#     # save as CSV
-#     np.savetxt(location +'/csvFiles/'+ fileNew +'.csv', signature[0], delimiter=",")
+def get_files_by_extension(base_dir, extension):
+    """ get list of files in a base_dir with specified extension
+        thanks @stg7 ;)
+    """
+    base_dir = os.path.dirname(base_dir + "/")  # fix for removing // in filenames
+    return list(filter(lambda x: extension in x,
+                       list(map(lambda x: base_dir + "/" + x,
+                                os.listdir(base_dir)))))
+
+
+def compare_fingerprits(fp_to_compare, location_of_fps):
+    """
+    tells what to files are most similar
+    Args:
+        fp_to_compare: (ndarray) just calculated fingerprint
+        location_of_fps: (str) location of calculated fingerprints
+    Returns:
+        result = (str) file it is most similar to
+    """
+    # check folder for .CSV files
+    database = get_files_by_extension(location_of_fps, 'csv')
+    # todo: finish here
+    return
+
+
+if __name__ == "__main__":
+    # Fingerprint calculation of one song or a snipit
+    file = 'path/to/file.wav'
+    fingerprint = calc_fingerprint(file)
+
+    # compare to other fingerprint
+    compare_file = 'path/to/fingerprint.csv'  # must be pre calculated before
+    comparison = np.loadtxt(compare_file, delimiter=",")
+    result = euclideanDistance(fingerprint, comparison)  # the minimum tells how close they are
+
+    """
+    compare it to other files and you will find by the over al minimum euclidean distance 
+    what audio file it is most similar to.
+    """
+
+    print(" minimum eucledean distances of the two files: " + str(np.min(result)))
+
+
+    ################################################################
+    # Automatic fingerprint calculation of a folder
+    ################################################################
+    #
+    # location = os.path.abspath(os.path.dirname(__file__))  # same folder
+    # namesAll = fileimporter(location, 'wav')
+    #
+    # for file in namesAll:
+    #     fileNew = file.replace(' ', '')[:-4]
+    #     audioFile, samplingrate = readAudiofile(file)
+    #     spectralFlatness = AudioSpectrumFlatness(audioFile, samplingrate)
+    #     signature = AudioSignature(spectralFlatness, 250, 1600, 32)
+    #     # remove existing file
+    #     if not os.path.exists(location +'/csvFiles/'):
+    #         os.makedirs(location +'/csvFiles/')
+    #     try:
+    #         os.remove(location +'/csvFiles/'+ fileNew + '.csv')
+    #         print('Remove old .csv file')
+    #     except OSError:
+    #         print('no old file '+fileNew+'.csv has not been found')
+    #     # save as CSV
+    #     np.savetxt(location +'/csvFiles/'+ fileNew +'.csv', signature[0], delimiter=",")
 
