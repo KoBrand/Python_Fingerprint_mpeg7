@@ -25,15 +25,15 @@ sudo pip3 install scipy
 Usage:
 -----------------
 * calculate some fingerprints using:
-'''
+```
 fingerprint = calc_fingerprint(wavefile.wav)
-'''
+```
 * compare to other fingerprint
-'''
+```
 compare_file = 'path/to/fingerprint.csv'  # must be pre calculated before
 comparison = np.loadtxt(compare_file, delimiter=",")
 result = np.min(euclideanDistance(fingerprint, comparison))
-'''
+```
 
 compare it to other files and you will find what audio file it is most similar to 
 with the over all minimum result 
