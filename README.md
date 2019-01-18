@@ -1,4 +1,4 @@
-# Python_Fingerprtint_mpeg7
+# Python_Fingerprint_mpeg7
 
 With this project I created a song recognition algorithm using the MPEG-7 standard for fingerprint calculation.
 
